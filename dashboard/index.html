@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Dashboard điều khiển giao thông</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 24px; background: #EEF3F8; color: #1D3557; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .card { background: #fff; border-radius: 10px; padding: 16px; min-width: 220px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .light { display: inline-block; width: 22px; height: 22px; border-radius: 50%; vertical-align: middle; margin-right: 8px; }
+  .GREEN { background: #2A9D8F; } .YELLOW { background: #E9A424; } .RED { background: #C0392B; }
+  button { padding: 8px 14px; margin: 4px 4px 0 0; cursor: pointer; }
+  pre { background: #f7f7f7; padding: 8px; max-height: 220px; overflow: auto; }
+</style>
+</head>
+<body>
+<h1>Dashboard điều khiển giao thông</h1>
+<div class="row">
+  <div class="card"><h3>Chế độ</h3><p id="mode">-</p>
+    <button onclick="setMode('AUTO')">Auto</button>
+    <button onclick="setMode('MANUAL')">Manual</button></div>
+  <div class="card"><h3>Đèn tín hiệu</h3><div id="lights">-</div></div>
+  <div class="card"><h3>Ép pha (Manual)</h3>
+    <button onclick="force('North-South')">Xanh Bắc - Nam</button>
+    <button onclick="force('East-West')">Xanh Đông - Tây</button>
+    <p id="msg"></p></div>
+</div>
+<div class="card" style="margin-top:16px"><h3>Nhật ký</h3><pre id="logs"></pre></div>
+
+<script>
+async function refresh() {
+  const s = await (await fetch('/api/status')).json();
+  document.getElementById('mode').textContent = s.mode;
+  document.getElementById('lights').innerHTML = Object.entries(s.lights)
+    .map(([k, v]) => `<p><span class="light ${v}"></span>${k}: ${v}</p>`).join('');
+  const logs = await (await fetch('/api/logs')).json();
+  document.getElementById('logs').textContent = logs.map(l => `${l.created_at}  ${l.action}  ${l.details}`).join('\n');
+}
+async function setMode(mode) {
+  await fetch('/api/control/mode', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({mode})});
+  refresh();
+}
+async function force(pair) {
+  const r = await fetch('/api/control/force-phase', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({direction_pair: pair})});
+  const d = await r.json();
+  document.getElementById('msg').textContent = r.ok ? 'Đã ép pha ' + pair : d.detail;
+  refresh();
+}
+refresh(); setInterval(refresh, 2000);  // Sprint 4: thay bang WebSocket
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+*.db
+data/videos/*.mp4
+*.pt
