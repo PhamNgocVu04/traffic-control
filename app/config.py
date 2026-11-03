@@ -12,6 +12,6 @@ YELLOW_TIME = 3     # giay, co dinh
 
 # Sprint 2: nhan dien xe
 YOLO_MODEL = os.getenv("YOLO_MODEL", "yolov8n.pt")
-YOLO_CONF = 0.3             # nguong tin cay toi thieu
+YOLO_CONF = 0.15            # nguong tin cay toi thieu
 DETECT_EVERY_N_FRAMES = 5   # 10 khung/giay -> nhan dien 2 lan/giay moi camera
 SAVE_COUNT_SECONDS = 5      # bao lau ghi so xe vao bang traffic_counts 1 lan
