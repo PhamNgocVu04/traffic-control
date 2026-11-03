@@ -29,3 +29,13 @@ def test_co_san_4_camera():
 
 def test_stream_huong_sai():
     assert client.get("/api/stream/Abc").status_code == 404
+
+
+def test_cau_hinh_roi():
+    r = client.put("/api/cameras/North/roi", json={"polygon": [[0.1, 0.5], [0.9, 0.5], [0.9, 1.0], [0.1, 1.0]]})
+    assert r.status_code == 200 and len(r.json()["roi"]["polygon"]) == 4
+    assert client.put("/api/cameras/North/roi", json={"polygon": [[0, 0], [2, 2], [0, 1]]}).status_code == 422
+
+
+def test_counts_khi_tat_worker():
+    assert client.get("/api/counts").json() == {}

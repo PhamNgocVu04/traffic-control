@@ -2,6 +2,8 @@ import os
 
 # Cho test dung CSDL rieng, khong ghi lan vao traffic.db that
 os.environ["DATABASE_URL"] = "sqlite:///./test_traffic.db"
+# Test khong chay 4 CameraWorker (khong can video that, chay nhanh)
+os.environ["DISABLE_WORKERS"] = "1"
 
 # Xoa CSDL test cu de moi lan chay test deu bat dau tu du lieu sach
 if os.path.exists("test_traffic.db"):
