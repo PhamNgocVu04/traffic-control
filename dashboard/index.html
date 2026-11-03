@@ -11,6 +11,10 @@
   .GREEN { background: #2A9D8F; } .YELLOW { background: #E9A424; } .RED { background: #C0392B; }
   button { padding: 8px 14px; margin: 4px 4px 0 0; cursor: pointer; }
   pre { background: #f7f7f7; padding: 8px; max-height: 220px; overflow: auto; }
+  .cams { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+  .cams figure { margin: 0; background: #fff; border-radius: 10px; padding: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .cams img { width: 100%; border-radius: 6px; background: #ccc; min-height: 120px; }
+  .cams figcaption { font-weight: bold; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -25,6 +29,12 @@
     <button onclick="force('East-West')">Xanh Đông - Tây</button>
     <p id="msg"></p></div>
 </div>
+<div class="cams">
+  <figure><img src="/api/stream/North" alt="Camera Bắc"><figcaption>Camera hướng Bắc · <span id="cnt-North">-</span></figcaption></figure>
+  <figure><img src="/api/stream/East" alt="Camera Đông"><figcaption>Camera hướng Đông · <span id="cnt-East">-</span></figcaption></figure>
+  <figure><img src="/api/stream/South" alt="Camera Nam"><figcaption>Camera hướng Nam · <span id="cnt-South">-</span></figcaption></figure>
+  <figure><img src="/api/stream/West" alt="Camera Tây"><figcaption>Camera hướng Tây · <span id="cnt-West">-</span></figcaption></figure>
+</div>
 <div class="card" style="margin-top:16px"><h3>Nhật ký</h3><pre id="logs"></pre></div>
 
 <script>
@@ -33,6 +43,13 @@ async function refresh() {
   document.getElementById('mode').textContent = s.mode;
   document.getElementById('lights').innerHTML = Object.entries(s.lights)
     .map(([k, v]) => `<p><span class="light ${v}"></span>${k}: ${v}</p>`).join('');
+  const counts = await (await fetch('/api/counts')).json();
+  for (const d of ['North', 'East', 'South', 'West']) {
+    const c = counts[d];
+    document.getElementById('cnt-' + d).textContent = c
+      ? `${c.total} xe (ô tô ${c.car}, xe máy ${c.motorbike}, buýt ${c.bus}, tải ${c.truck}) · mật độ ${c.density}`
+      : 'chưa có số liệu';
+  }
   const logs = await (await fetch('/api/logs')).json();
   document.getElementById('logs').textContent = logs.map(l => `${l.created_at}  ${l.action}  ${l.details}`).join('\n');
 }
