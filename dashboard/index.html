@@ -11,6 +11,10 @@
   .GREEN { background: #2A9D8F; } .YELLOW { background: #E9A424; } .RED { background: #C0392B; }
   button { padding: 8px 14px; margin: 4px 4px 0 0; cursor: pointer; }
   pre { background: #f7f7f7; padding: 8px; max-height: 220px; overflow: auto; }
+  .cams { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+  .cams figure { margin: 0; background: #fff; border-radius: 10px; padding: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .cams img { width: 100%; border-radius: 6px; background: #ccc; min-height: 120px; }
+  .cams figcaption { font-weight: bold; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -24,6 +28,12 @@
     <button onclick="force('North-South')">Xanh Bắc - Nam</button>
     <button onclick="force('East-West')">Xanh Đông - Tây</button>
     <p id="msg"></p></div>
+</div>
+<div class="cams">
+  <figure><img src="/api/stream/North" alt="Camera Bắc"><figcaption>Camera hướng Bắc</figcaption></figure>
+  <figure><img src="/api/stream/East" alt="Camera Đông"><figcaption>Camera hướng Đông</figcaption></figure>
+  <figure><img src="/api/stream/South" alt="Camera Nam"><figcaption>Camera hướng Nam</figcaption></figure>
+  <figure><img src="/api/stream/West" alt="Camera Tây"><figcaption>Camera hướng Tây</figcaption></figure>
 </div>
 <div class="card" style="margin-top:16px"><h3>Nhật ký</h3><pre id="logs"></pre></div>
 
