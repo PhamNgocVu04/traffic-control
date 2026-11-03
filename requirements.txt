@@ -1,0 +1,19 @@
+fastapi>=0.115
+uvicorn>=0.32
+sqlalchemy>=2.0
+pydantic>=2.12
+httpx>=0.28
+pytest>=8.3
+
+# Bat khi dung PostgreSQL
+# psycopg2-binary==2.9.10
+
+# Sprint 1: doc video
+opencv-python>=4.10
+
+# Sprint 2: dem xe bang YOLOv8 (keo theo PyTorch, tai vai tram MB)
+ultralytics>=8.3
+
+# Bat o Sprint 5 (xuat bao cao)
+# pandas==2.2.3
+# openpyxl==3.1.5
