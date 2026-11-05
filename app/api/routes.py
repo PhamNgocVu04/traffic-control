@@ -1,3 +1,5 @@
+import time
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -32,24 +34,24 @@ def create_camera(data: schemas.CameraIn, db: Session = Depends(get_db)):
 
 @router.get("/status")
 def get_status():
-    return controller.trang_thai()
+    return controller.trang_thai(time.monotonic())
 
 
 @router.post("/control/mode")
 def set_mode(data: schemas.ModeIn, db: Session = Depends(get_db)):
     controller.chuyen_che_do(data.mode)
     ghi_log(db, f"SWITCH_{data.mode}", f"Chuyen che do sang {data.mode}", data.user_id)
-    return controller.trang_thai()
+    return controller.trang_thai(time.monotonic())
 
 
 @router.post("/control/force-phase")
 def force_phase(data: schemas.ForcePhaseIn, db: Session = Depends(get_db)):
     try:
-        steps = controller.ep_pha(data.direction_pair)
+        steps = controller.ep_pha(data.direction_pair, time.monotonic())
     except PermissionError as e:
         raise HTTPException(status_code=409, detail=str(e))
     ghi_log(db, "OVERRIDE_GREEN", f"Ep xanh {data.direction_pair}: {steps}", data.user_id)
-    return {"steps": steps, **controller.trang_thai()}
+    return {"steps": steps, **controller.trang_thai(time.monotonic())}
 
 
 @router.get("/logs")

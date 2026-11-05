@@ -11,6 +11,7 @@ from app.api.routes import router
 from app.api.stream import router as stream_router
 from app.seed import seed_cameras
 from app.vision.worker import manager
+from app.controller import loop as control_loop
 
 Base.metadata.create_all(bind=engine)  # tao 5 bang neu chua co
 seed_cameras()                          # tao san 4 camera neu CSDL trong
@@ -19,13 +20,17 @@ seed_cameras()                          # tao san 4 camera neu CSDL trong
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Khi server bat: chay 4 CameraWorker (doc video + dem xe). Test thi tat de chay nhanh.
+    loop = None
     if os.getenv("DISABLE_WORKERS") != "1":
         manager.start_all()
+        loop = control_loop.khoi_dong()  # vong dieu khien den Auto (Sprint 3)
     yield
+    if loop:
+        loop.stop()
     manager.stop_all()                  # khi server tat: dung cac worker
 
 
-app = FastAPI(title="Phan mem dieu khien giao thong tich hop camera", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="Phan mem dieu khien giao thong tich hop camera", version="0.3.0", lifespan=lifespan)
 app.include_router(router)
 app.include_router(stream_router)
 

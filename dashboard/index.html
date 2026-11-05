@@ -23,7 +23,9 @@
   <div class="card"><h3>Chế độ</h3><p id="mode">-</p>
     <button onclick="setMode('AUTO')">Auto</button>
     <button onclick="setMode('MANUAL')">Manual</button></div>
-  <div class="card"><h3>Đèn tín hiệu</h3><div id="lights">-</div></div>
+  <div class="card"><h3>Đèn tín hiệu</h3><div id="lights">-</div>
+    <p id="timer" style="font-size:22px;font-weight:bold;margin:6px 0">-</p>
+    <p id="dens" style="font-size:13px;color:#555;margin:0">-</p></div>
   <div class="card"><h3>Ép pha (Manual)</h3>
     <button onclick="force('North-South')">Xanh Bắc - Nam</button>
     <button onclick="force('East-West')">Xanh Đông - Tây</button>
@@ -43,6 +45,11 @@ async function refresh() {
   document.getElementById('mode').textContent = s.mode;
   document.getElementById('lights').innerHTML = Object.entries(s.lights)
     .map(([k, v]) => `<p><span class="light ${v}"></span>${k}: ${v}</p>`).join('');
+  document.getElementById('timer').textContent = s.remaining_seconds !== null
+    ? `Còn ${s.remaining_seconds} giây` : (s.mode === 'MANUAL' ? 'Manual: giữ pha' : '-');
+  document.getElementById('dens').textContent = s.fallback
+    ? `Không đủ số liệu camera → xanh cố định`
+    : (s.density ? `Mật độ Bắc-Nam ${s.density['North-South']} · Đông-Tây ${s.density['East-West']} → xanh ${s.green_duration}s` : '');
   const counts = await (await fetch('/api/counts')).json();
   for (const d of ['North', 'East', 'South', 'West']) {
     const c = counts[d];
@@ -63,7 +70,7 @@ async function force(pair) {
   document.getElementById('msg').textContent = r.ok ? 'Đã ép pha ' + pair : d.detail;
   refresh();
 }
-refresh(); setInterval(refresh, 2000);  // Sprint 4: thay bang WebSocket
+refresh(); setInterval(refresh, 1000);  // Sprint 4: thay bang WebSocket
 </script>
 </body>
 </html>
