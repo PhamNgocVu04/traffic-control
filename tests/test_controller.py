@@ -28,6 +28,8 @@ def test_thoi_luong_xanh_nam_trong_bien():
 def test_ep_pha_phai_o_manual():
     tc = TrafficController()
     with pytest.raises(PermissionError):
-        tc.ep_pha("East-West")
+        tc.ep_pha("East-West", now=0)
     tc.chuyen_che_do("MANUAL")
-    assert tc.ep_pha("East-West")[-1] == {"East-West": "GREEN"}
+    assert tc.ep_pha("East-West", now=0) == [{"North-South": "YELLOW"}]   # vang dem truoc
+    tc.tick(now=3)                                                           # sau 3 giay vang
+    assert tc.state_machine.lights == {"North-South": "RED", "East-West": "GREEN"}

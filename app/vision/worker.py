@@ -2,9 +2,10 @@
 Dashboard chi lay khung hinh moi nhat tu worker, nen nhieu nguoi xem cung khong ton them CPU."""
 import threading
 import time
+from collections import deque
 
 from app import models
-from app.config import DETECT_EVERY_N_FRAMES, SAVE_COUNT_SECONDS
+from app.config import DETECT_EVERY_N_FRAMES, SAVE_COUNT_SECONDS, SMOOTH_WINDOW
 from app.database import SessionLocal
 from app.vision.engine import VisionEngine, STREAM_FPS, roi_sang_pixel, tao_detector
 
@@ -24,6 +25,7 @@ class CameraWorker(threading.Thread):
         self.latest_jpeg: bytes | None = None
         self.latest_counts: dict | None = None
         self.error: str | None = None
+        self.history = deque(maxlen=SMOOTH_WINDOW)  # cac lan dem gan nhat de lay trung binh
 
     def run(self):
         detections, last_save = [], time.monotonic()
@@ -36,8 +38,9 @@ class CameraWorker(threading.Thread):
                 roi_px = roi_sang_pixel(self.roi, w, h)
                 if i % self.detect_every == 0 and self.engine.detector is not None:
                     detections = self.engine.phat_hien_xe(frame)
+                    self.history.append(self.engine.dem_xe(detections, roi_px))
                     with self.lock:
-                        self.latest_counts = self.engine.dem_xe(detections, roi_px)
+                        self.latest_counts = self.lam_muot(self.history)
                 img = self.engine.ve_ket_qua(frame, detections, roi_px, self.latest_counts)
                 with self.lock:
                     self.latest_jpeg = self.engine.ma_hoa_jpeg(img)
@@ -48,6 +51,15 @@ class CameraWorker(threading.Thread):
                     time.sleep(1 / STREAM_FPS)
         except FileNotFoundError as e:
             self.error = str(e)
+
+    @staticmethod
+    def lam_muot(history) -> dict:
+        """Trung binh cac lan dem gan nhat: so xe khong nhay 4 -> 12 -> 4 giua cac khung hinh."""
+        n = len(history)
+        avg = {k: sum(h[k] for h in history) / n for k in history[-1]}
+        out = {k: round(v) for k, v in avg.items() if k != "density"}
+        out["density"] = round(avg["density"], 1)
+        return out
 
     def luu_so_xe(self, counts: dict):
         db = SessionLocal()

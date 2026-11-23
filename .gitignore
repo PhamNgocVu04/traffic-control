@@ -4,3 +4,4 @@ __pycache__/
 *.db
 data/videos/*.mp4
 *.pt
+tools/roi_auto_*.png
