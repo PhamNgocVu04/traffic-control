@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from app.database import Base, engine
 from app.api.routes import router
 from app.api.stream import router as stream_router
+from app.api.monitor import router as monitor_router
 from app.seed import seed_cameras
 from app.vision.worker import manager
 from app.controller import loop as control_loop
@@ -30,9 +31,10 @@ async def lifespan(app: FastAPI):
     manager.stop_all()                  # khi server tat: dung cac worker
 
 
-app = FastAPI(title="Phan mem dieu khien giao thong tich hop camera", version="0.3.0", lifespan=lifespan)
+app = FastAPI(title="Phan mem dieu khien giao thong tich hop camera", version="0.4.0", lifespan=lifespan)
 app.include_router(router)
 app.include_router(stream_router)
+app.include_router(monitor_router)
 
 DASHBOARD_DIR = Path(__file__).resolve().parent.parent / "dashboard"
 app.mount("/dashboard", StaticFiles(directory=DASHBOARD_DIR, html=True), name="dashboard")
