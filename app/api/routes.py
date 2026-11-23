@@ -54,8 +54,12 @@ def force_phase(data: schemas.ForcePhaseIn, db: Session = Depends(get_db)):
     return {"steps": steps, **controller.trang_thai(time.monotonic())}
 
 
-@router.get("/logs")
-def list_logs(limit: int = 20, db: Session = Depends(get_db)):
+def lay_logs(db: Session, limit: int = 20) -> list[dict]:
     rows = db.query(models.SystemLog).order_by(models.SystemLog.id.desc()).limit(limit).all()
     return [{"id": r.id, "action": r.action_type, "details": r.details,
-             "created_at": r.created_at.isoformat()} for r in rows]
+             "created_at": models.iso_utc(r.created_at)} for r in rows]
+
+
+@router.get("/logs")
+def list_logs(limit: int = 20, db: Session = Depends(get_db)):
+    return lay_logs(db, limit)

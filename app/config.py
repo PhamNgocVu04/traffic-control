@@ -23,3 +23,8 @@ SAVE_COUNT_SECONDS = 5      # bao lau ghi so xe vao bang traffic_counts 1 lan
 SMOOTH_WINDOW = 5           # lay trung binh 5 lan dem gan nhat cho so lieu on dinh
 FIXED_GREEN = 30            # giay xanh co dinh khi khong co so lieu camera (du phong)
 CONTROL_TICK = 0.5          # giay; vong dieu khien kiem tra den bao lau 1 lan
+
+# Sprint 4: giam sat thoi gian thuc va canh bao un tac
+CONGESTION_DENSITY = 20.0   # mat do quy doi (PCU) cua 1 cap huong tu muc nay tro len = un tac
+CONGESTION_CYCLES = 2       # vuot nguong lien tiep 2 chu ky den moi canh bao (tranh bao nham)
+WS_PUSH_SECONDS = 1.0       # WebSocket day du lieu len dashboard moi 1 giay

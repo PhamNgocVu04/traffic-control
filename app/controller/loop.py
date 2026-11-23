@@ -7,6 +7,7 @@ from app import models
 from app.config import CONTROL_TICK
 from app.database import SessionLocal
 from app.controller.traffic_controller import controller
+from app.services.alerts import monitor
 from app.vision.worker import manager
 
 
@@ -23,6 +24,16 @@ def ghi_trang_thai_den(pair, color, duration, mode):
     try:
         db.add(models.TrafficLightState(direction_pair=pair, current_phase=color,
                                         duration_seconds=int(duration), mode=mode))
+        # Sprint 4: moi lan 1 cap huong bat dau xanh = 1 chu ky -> kiem tra un tac cua cap do
+        density = controller.last_density
+        if color == "GREEN" and mode == "AUTO" and density:
+            event = monitor.cap_nhat(pair, density.get(pair))
+            if event == "RAISE":
+                db.add(models.SystemLog(action_type="CONGESTION_ALERT",
+                                        details=f"Un tac huong {pair}: mat do {density[pair]}"))
+            elif event == "CLEAR":
+                db.add(models.SystemLog(action_type="CONGESTION_CLEAR",
+                                        details=f"Het un tac huong {pair}"))
         db.commit()
     finally:
         db.close()
