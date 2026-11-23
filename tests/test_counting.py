@@ -64,3 +64,13 @@ def test_worker_bao_loi_khi_thieu_video():
     w = CameraWorker(1, "North", "khong_co.mp4", None, VisionEngine(FakeDetector()), realtime=False)
     w.run()
     assert w.error is not None
+def test_loc_bo_mai_nha_nhan_nham():
+    from app.vision.engine import loc_ket_qua
+    dets = [
+        {"cls": "car", "box": (10, 10, 40, 30), "conf": 0.2},
+        {"cls": "truck", "box": (100, 100, 140, 130), "conf": 0.3},
+        {"cls": "bus", "box": (200, 50, 480, 300), "conf": 0.9},
+        {"cls": "truck", "box": (500, 300, 560, 340), "conf": 0.8},
+    ]
+    kept = loc_ket_qua(dets, 640, 360)
+    assert [d["cls"] for d in kept] == ["car", "truck"]

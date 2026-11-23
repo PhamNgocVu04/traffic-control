@@ -10,7 +10,7 @@ import urllib.request
 import cv2
 import numpy as np
 
-SERVER = "http://127.0.0.1:8000"
+SERVER = "http://127.0.0.1:8001"
 SHOW_WIDTH = 960  # hien thi to hon de click chinh xac
 
 

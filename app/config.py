@@ -13,6 +13,9 @@ YELLOW_TIME = 3     # giay, co dinh
 # Sprint 2: nhan dien xe
 YOLO_MODEL = os.getenv("YOLO_MODEL", "yolov8n.pt")
 YOLO_CONF = 0.15            # nguong tin cay toi thieu
+# Xe buyt/xe tai de bi nham voi mai nha nhin tu tren cao -> doi hoi tin cay cao hon
+CLASS_CONF = {"car": 0.15, "motorbike": 0.15, "bus": 0.6, "truck": 0.6}
+MAX_BOX_RATIO = 0.03        # box lon hon 3% khung hinh -> khong phai xe (mai nha, bai dat)
 DETECT_EVERY_N_FRAMES = 5   # 10 khung/giay -> nhan dien 2 lan/giay moi camera
 SAVE_COUNT_SECONDS = 5      # bao lau ghi so xe vao bang traffic_counts 1 lan
 
