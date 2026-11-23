@@ -33,7 +33,7 @@ class YoloDetector:
             if self.model is None:
                 from ultralytics import YOLO  # import tai day de may chua cai YOLO van chay duoc Sprint 1
                 self.model = YOLO(self.model_path)
-            result = self.model(frame, classes=list(COCO_TO_VEHICLE), conf=self.conf, verbose=False)[0]
+            result = self.model(frame, classes=list(COCO_TO_VEHICLE), conf=self.conf, iou=0.5, agnostic_nms=True, verbose=False)[0]
         out = []
         for box, cls, conf in zip(result.boxes.xyxy.tolist(), result.boxes.cls.tolist(), result.boxes.conf.tolist()):
             out.append({"cls": COCO_TO_VEHICLE[int(cls)], "box": tuple(int(v) for v in box), "conf": round(conf, 2)})
