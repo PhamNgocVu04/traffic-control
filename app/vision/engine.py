@@ -7,7 +7,7 @@ import time
 import cv2
 import numpy as np
 
-from app.config import YOLO_MODEL, YOLO_CONF
+from app.config import YOLO_MODEL, YOLO_CONF, CLASS_CONF, MAX_BOX_RATIO
 
 FRAME_WIDTH = 640   # thu nho khung hinh de 4 luong chay muot (video goc co the la 4K)
 STREAM_FPS = 10     # so khung hinh/giay gui len Dashboard
@@ -38,6 +38,20 @@ class YoloDetector:
         for box, cls, conf in zip(result.boxes.xyxy.tolist(), result.boxes.cls.tolist(), result.boxes.conf.tolist()):
             out.append({"cls": COCO_TO_VEHICLE[int(cls)], "box": tuple(int(v) for v in box), "conf": round(conf, 2)})
         return out
+
+
+def loc_ket_qua(detections: list[dict], width: int, height: int) -> list[dict]:
+    """Bo nhan dien nham: (1) xe buyt/xe tai co do tin cay thap, (2) box qua lon so voi khung hinh."""
+    max_area = MAX_BOX_RATIO * width * height
+    out = []
+    for d in detections:
+        x1, y1, x2, y2 = d["box"]
+        if d["conf"] < CLASS_CONF.get(d["cls"], YOLO_CONF):
+            continue
+        if (x2 - x1) * (y2 - y1) > max_area:
+            continue
+        out.append(d)
+    return out
 
 
 def tao_detector():
@@ -113,7 +127,8 @@ class VisionEngine:
         """Tra ve [{'cls': 'car', 'box': (x1, y1, x2, y2), 'conf': 0.87}, ...]."""
         if self.detector is None:
             return []
-        return self.detector.detect(frame)
+        h, w = frame.shape[:2]
+        return loc_ket_qua(self.detector.detect(frame), w, h)
 
     @staticmethod
     def dem_xe(detections: list[dict], roi_polygon=None) -> dict:
@@ -136,6 +151,8 @@ class VisionEngine:
             cv2.polylines(img, [roi_polygon], True, (255, 255, 0), 2)
         for d in detections:
             x1, y1, x2, y2 = d["box"]
+            if roi_polygon is not None and cv2.pointPolygonTest(roi_polygon, ((x1 + x2) / 2, y2), False) < 0:
+                continue  # xe ngoai ROI: khong dem nen cung khong ve
             color = COLORS[d["cls"]]
             cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
             cv2.putText(img, d["cls"], (x1, max(y1 - 4, 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)

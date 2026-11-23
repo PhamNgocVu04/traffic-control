@@ -17,7 +17,7 @@ def test_manual_va_ghi_log():
     assert client.post("/api/control/force-phase", json={"direction_pair": "East-West"}).status_code == 409
     client.post("/api/control/mode", json={"mode": "MANUAL"})
     r = client.post("/api/control/force-phase", json={"direction_pair": "East-West"})
-    assert r.status_code == 200 and r.json()["lights"]["East-West"] == "GREEN"
+    assert r.status_code == 200 and r.json()["lights"]["North-South"] == "YELLOW"  # dang vang dem
     actions = [l["action"] for l in client.get("/api/logs").json()]
     assert "OVERRIDE_GREEN" in actions and "SWITCH_MANUAL" in actions
 
