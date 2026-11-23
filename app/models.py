@@ -9,6 +9,11 @@ def now():
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
+def iso_utc(dt: datetime | None) -> str | None:
+    """CSDL luu gio UTC khong kem mui gio -> gan '+00:00' de trinh duyet tu doi sang gio Viet Nam."""
+    return dt.replace(tzinfo=timezone.utc).isoformat() if dt else None
+
+
 # BigInteger tren PostgreSQL, Integer tren SQLite (de autoincrement hoat dong)
 BigId = BigInteger().with_variant(Integer, "sqlite")
 

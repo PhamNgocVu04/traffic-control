@@ -1,5 +1,6 @@
 fastapi>=0.115
 uvicorn>=0.32
+websockets>=13.0      # Sprint 4: uvicorn can goi nay de chay WebSocket
 sqlalchemy>=2.0
 pydantic>=2.12
 httpx>=0.28
