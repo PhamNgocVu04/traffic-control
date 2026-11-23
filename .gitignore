@@ -5,3 +5,6 @@ __pycache__/
 data/videos/*.mp4
 *.pt
 tools/roi_auto_*.png
+
+apply_sprint4.py
+data/videos/
